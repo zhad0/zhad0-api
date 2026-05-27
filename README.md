@@ -1,6 +1,6 @@
 # ZHAD0 API
 
-[![Status](https://img.shields.io/badge/status-design__preview-ff3d8a.svg)](https://zhad0.io)
+[![Status](https://img.shields.io/badge/status-live-00d26a.svg)](https://zhad0.io)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > Express + Drizzle ORM backend for the ZHAD0 Protocol.
