@@ -1,0 +1,401 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: ZHAD0 Protocol API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: stats
+    description: Protocol statistics
+  - name: relayers
+    description: Ghost Relay network
+  - name: intents
+    description: Intent privacy feed
+  - name: chain
+    description: Base chain info
+  - name: token
+    description: ZHAD0 token info
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /stats:
+    get:
+      operationId: getProtocolStats
+      tags: [stats]
+      summary: Get live protocol statistics
+      responses:
+        "200":
+          description: Protocol stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProtocolStats"
+
+  /relayers:
+    get:
+      operationId: listRelayers
+      tags: [relayers]
+      summary: List active Ghost Relayers
+      responses:
+        "200":
+          description: List of relayers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relayer"
+
+  /relayers/{id}:
+    get:
+      operationId: getRelayer
+      tags: [relayers]
+      summary: Get a single relayer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Relayer details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Relayer"
+        "404":
+          description: Not found
+
+  /intents/feed:
+    get:
+      operationId: getIntentFeed
+      tags: [intents]
+      summary: Get recent anonymized intent activity
+      responses:
+        "200":
+          description: Recent intents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IntentActivity"
+
+  /intents/stats:
+    get:
+      operationId: getIntentStats
+      tags: [intents]
+      summary: Aggregated intent statistics by category
+      responses:
+        "200":
+          description: Intent stats breakdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntentStats"
+
+  /chain:
+    get:
+      operationId: getChainInfo
+      tags: [chain]
+      summary: Get Base chain information
+      responses:
+        "200":
+          description: Chain info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChainInfo"
+
+  /token:
+    get:
+      operationId: getTokenInfo
+      tags: [token]
+      summary: Get ZHAD0 token information
+      responses:
+        "200":
+          description: Token info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenInfo"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    ProtocolStats:
+      type: object
+      required:
+        - totalRelayers
+        - activeRelayers
+        - totalIntentsProcessed
+        - totalFeesEth
+        - totalStakedZhad0
+        - zkProofsGenerated
+        - avgRelayTimeMs
+        - uptimePct
+      properties:
+        totalRelayers:
+          type: integer
+        activeRelayers:
+          type: integer
+        totalIntentsProcessed:
+          type: integer
+        totalFeesEth:
+          type: string
+        totalStakedZhad0:
+          type: string
+        zkProofsGenerated:
+          type: integer
+        avgRelayTimeMs:
+          type: integer
+        uptimePct:
+          type: number
+
+    Relayer:
+      type: object
+      required:
+        - id
+        - operatorAddress
+        - stakedZhad0
+        - status
+        - uptimePct
+        - intentsRelayed
+        - earningsEth
+        - region
+        - registeredAt
+      properties:
+        id:
+          type: string
+        operatorAddress:
+          type: string
+        stakedZhad0:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, slashed]
+        uptimePct:
+          type: number
+        intentsRelayed:
+          type: integer
+        earningsEth:
+          type: string
+        region:
+          type: string
+        registeredAt:
+          type: string
+
+    IntentActivity:
+      type: object
+      required:
+        - id
+        - proofHash
+        - agentFramework
+        - relayedAt
+        - feeEth
+        - status
+        - relayerRegion
+      properties:
+        id:
+          type: string
+        proofHash:
+          type: string
+        agentFramework:
+          type: string
+          enum: [Virtuals, Eliza, AgentKit, Unknown]
+        relayedAt:
+          type: string
+        feeEth:
+          type: string
+        status:
+          type: string
+          enum: [confirmed, pending, failed]
+        relayerRegion:
+          type: string
+
+    IntentStats:
+      type: object
+      required:
+        - byFramework
+        - byStatus
+        - last24hIntents
+        - last24hFeesEth
+      properties:
+        byFramework:
+          type: array
+          items:
+            $ref: "#/components/schemas/FrameworkBreakdown"
+        byStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusBreakdown"
+        last24hIntents:
+          type: integer
+        last24hFeesEth:
+          type: string
+
+    FrameworkBreakdown:
+      type: object
+      required: [framework, count, pct]
+      properties:
+        framework:
+          type: string
+        count:
+          type: integer
+        pct:
+          type: number
+
+    StatusBreakdown:
+      type: object
+      required: [status, count, pct]
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+        pct:
+          type: number
+
+    ChainInfo:
+      type: object
+      required:
+        - name
+        - chainId
+        - rpcUrl
+        - explorerUrl
+        - nativeCurrency
+        - isL2
+        - settlementChain
+        - blockTime
+        - contractAddress
+      properties:
+        name:
+          type: string
+        chainId:
+          type: integer
+        rpcUrl:
+          type: string
+        explorerUrl:
+          type: string
+        nativeCurrency:
+          $ref: "#/components/schemas/NativeCurrency"
+        isL2:
+          type: boolean
+        settlementChain:
+          type: string
+        blockTime:
+          type: number
+        contractAddress:
+          type: string
+
+    NativeCurrency:
+      type: object
+      required: [name, symbol, decimals]
+      properties:
+        name:
+          type: string
+        symbol:
+          type: string
+        decimals:
+          type: integer
+
+    TokenInfo:
+      type: object
+      required:
+        - symbol
+        - name
+        - totalSupply
+        - circulatingSupply
+        - holders
+        - contractAddress
+        - distribution
+        - vestingSchedule
+        - phaseStatus
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        totalSupply:
+          type: string
+        circulatingSupply:
+          type: string
+        holders:
+          type: integer
+        contractAddress:
+          type: string
+        distribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/TokenAllocation"
+        vestingSchedule:
+          type: array
+          items:
+            $ref: "#/components/schemas/VestingEntry"
+        phaseStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhaseStatus"
+
+    TokenAllocation:
+      type: object
+      required: [label, pct, amount, color]
+      properties:
+        label:
+          type: string
+        pct:
+          type: number
+        amount:
+          type: string
+        color:
+          type: string
+
+    VestingEntry:
+      type: object
+      required: [group, cliff, vesting, tge]
+      properties:
+        group:
+          type: string
+        cliff:
+          type: string
+        vesting:
+          type: string
+        tge:
+          type: string
+
+    PhaseStatus:
+      type: object
+      required: [phase, label, status, description]
+      properties:
+        phase:
+          type: integer
+        label:
+          type: string
+        status:
+          type: string
+          enum: [completed, active, upcoming]
+        description:
+          type: string

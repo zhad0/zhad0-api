@@ -1,0 +1,48 @@
+{
+  "name": "zhad0-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ZHAD0 Protocol API server — Express + Drizzle ORM + PostgreSQL backend for the Ghost Relay network",
+  "homepage": "https://zhad0.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhad0/zhad0-api.git"
+  },
+  "author": "zhad0",
+  "license": "MIT",
+  "keywords": [
+    "zhad0", "api", "express", "drizzle-orm", "postgresql",
+    "ghost-relay", "base-l2", "privacy", "ai-agents", "web3", "typescript"
+  ],
+  "scripts": {
+    "dev": "node --enable-source-maps ./dist/index.mjs",
+    "build": "node ./build.mjs",
+    "start": "NODE_ENV=production node --enable-source-maps ./dist/index.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "drizzle-orm": "^0.42.0",
+    "express": "^5.2.1",
+    "pg": "^8.20.0",
+    "pino": "^9.14.0",
+    "pino-http": "^10.5.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "drizzle-zod": "^0.8.3",
+    "esbuild": "^0.27.3",
+    "esbuild-plugin-pino": "^2.3.3",
+    "pino-pretty": "^13.1.3",
+    "thread-stream": "^3.1.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
